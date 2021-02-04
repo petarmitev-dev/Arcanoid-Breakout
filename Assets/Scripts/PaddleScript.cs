@@ -57,7 +57,7 @@ public class PaddleScript : MonoBehaviour
         Vector3 hitPoint = coll.contacts[0].point;
         Vector3 paddleCenter =  new Vector3(this.gameObject.transform.position.x,this.gameObject.transform.position.y);
         
-       // ballRB.velocity = Vector2.zero;
+       ballRB.velocity = Vector2.zero;
         float difference = paddleCenter.x - hitPoint.x;
            
         if(hitPoint.x < paddleCenter.x){

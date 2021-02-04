@@ -15,7 +15,7 @@ public class BallsManager : MonoBehaviour
 [SerializeField]  private Ball ballPrefab;
   private Ball initialBall;
 
-  public float initialBallSpeed = 200;
+  public float initialBallSpeed;
   private Rigidbody2D initialBallRb;
 
   void Awake(){
@@ -39,7 +39,7 @@ public class BallsManager : MonoBehaviour
           Vector3 ballPosition = new Vector3(paddlePosition.x,paddlePosition.y + .27f,0);
           initialBall.transform.position = ballPosition;
       }
-      if(Input.GetMouseButton(0)){
+      if(Input.GetMouseButtonDown(0)){
           initialBallRb.isKinematic = false;
           initialBallRb.AddForce(new Vector2(0,initialBallSpeed));
           GameManager.instance.IsGameStarted = true;

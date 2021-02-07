@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -33,20 +34,32 @@ public class BallsManager : MonoBehaviour
  }
 
   private void Update(){
-      if(!GameManager.instance.IsGameStarted){
+      if(!GameManager.instance.IsGameStarted)
+      {
 
           Vector3 paddlePosition = PaddleScript.instance.gameObject.transform.position;
           Vector3 ballPosition = new Vector3(paddlePosition.x,paddlePosition.y + .27f,0);
           initialBall.transform.position = ballPosition;
-      }
-      if(Input.GetMouseButtonDown(0)){
+      
+      if(Input.GetMouseButtonDown(0) )
+      {
           initialBallRb.isKinematic = false;
           initialBallRb.AddForce(new Vector2(0,initialBallSpeed));
           GameManager.instance.IsGameStarted = true;
+       }
       }
   }
 
- private void InitBalls(){
+public void ResetBall()
+    {
+        foreach (var ball in this.Balls)
+        {
+            Destroy(ball.gameObject);
+        }
+        InitBalls();
+    }
+
+    private void InitBalls(){
      Vector3 paddlePosition = PaddleScript.instance.gameObject.transform.position;
      Vector3 startingPosition = new Vector3(paddlePosition.x,paddlePosition.y + .27f,0);
      initialBall = Instantiate(ballPrefab,startingPosition,Quaternion.identity);

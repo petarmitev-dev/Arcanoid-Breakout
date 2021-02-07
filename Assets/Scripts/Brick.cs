@@ -24,6 +24,7 @@ private void OnCollisionEnter2D(Collision2D coll){
     {
        this.hitPoints --;
        if(this.hitPoints <= 0){
+           BricksManager.instance.RemainingBricks.Remove(this);
            OnBrickDestruction?.Invoke(this);
            SpawnDestroyEffect();
            Destroy(this.gameObject);

@@ -11,6 +11,7 @@ public class BricksManager : MonoBehaviour
 
   private static BricksManager _instance;
   public static BricksManager instance => _instance;
+ public  static event Action OnLevelLoaded ;
 
   void Awake(){
       if(_instance !=null){
@@ -36,16 +37,37 @@ private float initialBricksSpawnPositionX = - 1.96f;
   public List<int[,]> LevelsData{get;set;}
   public List<Brick> RemainingBricks{get;set;}
     public int InitialBrickCount { get; set; }
+    public int CurrentLevelentLevel { get; internal set; }
+   
+
+    public void LoadLevel(int level )
+    {
+ this.CurrentLevel = level;
+this.ClearRemainingBricks();
+this.GeneratedBricks();
+    }
+
+    public void LoadNextLevel()
+    {
+        this.CurrentLevel++;
+        if(this.CurrentLevel >= this.LevelsData.Count){
+            GameManager.instance.ShowVictoryScreen();
+        } 
+        else {
+            this.LoadLevel(this.CurrentLevel);
+        }
+    }
 
     private void Start(){
       this.LevelsData = this.LoadLevelsData();
       this.brickContainer = new GameObject("BrickContainer");
-      this.RemainingBricks = new List<Brick>();
       this.GeneratedBricks();
+      
   }
 
     private void GeneratedBricks()
     {
+    this.RemainingBricks = new List<Brick>();
     int[,] currentLevelData = this.LevelsData[this.CurrentLevel];
      float  currentSpawnX = initialBricksSpawnPositionX;
       float  currentSpawnY = initialBricksSpawnPositionY;
@@ -69,6 +91,16 @@ private float initialBricksSpawnPositionX = - 1.96f;
           currentSpawnY -= shiftAmount;
       }
       this.InitialBrickCount = this.RemainingBricks.Count;
+      OnLevelLoaded?.Invoke();
+    }
+
+
+    private void ClearRemainingBricks()
+    {
+        foreach ( Brick brick  in this.RemainingBricks.ToArray())
+        {
+           Destroy(brick.gameObject); 
+        }
     }
 
     private List<int[,]> LoadLevelsData()

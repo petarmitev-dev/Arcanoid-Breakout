@@ -5,7 +5,7 @@ public class MultiBall : Collectable
 
 foreach (Ball ball in BallsManager.instance.Balls.ToArray())
 {
-    BallsManager.instance.SpawnBall(ball.gameObject.transform.position,2);
+    BallsManager.instance.SpawnBall(ball.gameObject.transform.position,2,ball.isLightningBall);
 }  
       
     }

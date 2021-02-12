@@ -11,7 +11,10 @@ public class BallsManager : MonoBehaviour
 #region Singleton
 
   private static BallsManager _instance;
-  public static BallsManager instance => _instance;
+
+  
+
+    public static BallsManager instance => _instance;
 
 [SerializeField]  private Ball ballPrefab;
   private Ball initialBall;
@@ -49,6 +52,18 @@ public class BallsManager : MonoBehaviour
        }
       }
   }
+
+    public void SpawnBall(Vector3 position, int count)
+    {
+    for (int i = 0; i < count; i++)
+    {
+        Ball spawnBall = Instantiate(ballPrefab,position,Quaternion.identity) as Ball;
+        Rigidbody2D spawnBallRb = spawnBall.GetComponent<Rigidbody2D>();
+       spawnBallRb.isKinematic = false;
+        spawnBallRb.AddForce(new Vector2(0,initialBallSpeed));
+        this.Balls.Add(spawnBall);
+    }
+    }
 
 public void ResetBall()
     {

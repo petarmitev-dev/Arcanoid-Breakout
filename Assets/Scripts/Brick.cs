@@ -26,6 +26,7 @@ private void OnCollisionEnter2D(Collision2D coll){
        if(this.hitPoints <= 0){
            BricksManager.instance.RemainingBricks.Remove(this);
            OnBrickDestruction?.Invoke(this);
+           OnBricksDestroy();
            SpawnDestroyEffect();
            Destroy(this.gameObject);
        } else {
@@ -33,6 +34,41 @@ private void OnCollisionEnter2D(Collision2D coll){
              this.spriteRenderer.sprite = BricksManager.instance.sprites[this.hitPoints -1];
        }
 
+    }
+
+    private void OnBricksDestroy()
+    {
+        float buffSpawnChance = UnityEngine.Random.Range(0,100f);
+        
+        float deBuffSpawnChance = UnityEngine.Random.Range(0,100f);
+
+        bool alreadySpawned = false;
+        if(buffSpawnChance <= CollectableManager.instance.buffChance){
+            alreadySpawned = true;
+            Collectable newBuff = this.SpawnCollectable(true);
+        }
+        if(deBuffSpawnChance <= CollectableManager.instance.deBuffChance && !alreadySpawned){
+            Collectable newBuff = this.SpawnCollectable(false);
+        }
+    }
+
+    private Collectable SpawnCollectable(bool isBuff)
+    {
+        List<Collectable> collection;
+        if(isBuff)
+        {
+            collection = CollectableManager.instance.availableBuffs;
+        }
+        else
+        {
+            collection =CollectableManager.instance.availableDeBuffs;
+        }
+
+        int buffIndex = UnityEngine.Random.Range(0,collection.Count);
+        Collectable prefab = collection[buffIndex];
+        Collectable newCollectable = Instantiate(prefab,this.transform.position,Quaternion.identity) as Collectable;
+
+        return newCollectable;
     }
 
     private void SpawnDestroyEffect()

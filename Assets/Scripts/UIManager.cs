@@ -55,5 +55,7 @@ private void Start(){
     private void OnDisable(){
         Brick.OnBrickDestruction -= OnBrickDestruction;
         BricksManager.OnLevelLoaded -= OnLevelLoaded;
+         GameManager.OnLiveLost -= OnLiveLost;
+
     }
 }

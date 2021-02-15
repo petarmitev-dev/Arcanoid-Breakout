@@ -13,6 +13,7 @@ public class PaddleScript : MonoBehaviour
   public static PaddleScript instance => _instance;
 
     public bool PaddleTransforming { get; set; }
+    
 
   
     void Awake(){
@@ -23,13 +24,21 @@ public class PaddleScript : MonoBehaviour
       }
   }  
   #endregion
+
+  //Shooting Variables
+public bool PaddleShooting{get;set;}
+public GameObject leftMuzzle;
+public GameObject rightMuzzle;
+public Projectile bulletPrefab;
+
+
     private Camera mainCamera;
     private float paddleInitialy;
     private float defaultPaddleWithInPixels = 200;
     private  float defaultLeftClamp =  115;
       private  float defaultRightClamp = 410;
     private SpriteRenderer spriteRenderer;
-    public  float extendShrinkDuration = 30;
+    public  float extendShrinkDuration = 10;
     public float paddleWidth = 2;
     public float paddleHeight = 0.28f;
 
@@ -48,45 +57,57 @@ public class PaddleScript : MonoBehaviour
     private void Update()
     {
         PaddleMovement();
+        UpdateMuzzlePosition();
     }
 
-      public void StartWidthAmnimation(float newWidth)
+    private void UpdateMuzzlePosition()
+    {
+      leftMuzzle.transform.position = new Vector3(this.transform.position.x - (this.spriteRenderer.size.x/2) + 0.1f,this.transform.position.y  + 0.2f, this.transform.position.z);
+       rightMuzzle.transform.position = new Vector3(this.transform.position.x + (this.spriteRenderer.size.x/2) - 0.153f,this.transform.position.y  + 0.2f, this.transform.position.z);
+    }
+
+    public void StartWidthAmnimation(float newWidth)
     {
 
    StartCoroutine(AnimatePaddleWidth(newWidth));     
 
     }
 
-    public  IEnumerator AnimatePaddleWidth(float width)
+    public IEnumerator AnimatePaddleWidth(float width)
     {
         this.PaddleTransforming = true;
         this.StartCoroutine(ResetPaddleWidthAfterTime(this.extendShrinkDuration));
 
-        if(width > this.spriteRenderer.size.x ){
-          float currentWidth = this.spriteRenderer.size.x;
-          while (currentWidth < width)
-          {
-              currentWidth += Time.deltaTime * 2;
-              this.spriteRenderer.size = new Vector2(currentWidth,paddleHeight);
-              boxCollider.size =  new Vector2(currentWidth,paddleHeight);
-              yield return null;
-          }
-        } else {
-
- float currentWidth = this.spriteRenderer.size.x;          
-           while(currentWidth > width){
-              currentWidth -= Time.deltaTime * 2;
-              this.spriteRenderer.size = new Vector2(currentWidth,paddleHeight);
-              boxCollider.size =  new Vector2(currentWidth,paddleHeight);
-              yield return null;
-           }
+        if (width > this.spriteRenderer.size.x)
+        {
+            float currentWidth = this.spriteRenderer.size.x;
+            while (currentWidth < width)
+            {
+                currentWidth += Time.deltaTime * 2;
+                this.spriteRenderer.size = new Vector2(currentWidth, paddleHeight);
+                boxCollider.size = new Vector2(currentWidth, paddleHeight);
+                yield return null;
+            }
         }
+        else
+        {
+            float currentWidth = this.spriteRenderer.size.x;
+            while (currentWidth > width)
+            {
+                currentWidth -= Time.deltaTime * 2;
+                this.spriteRenderer.size = new Vector2(currentWidth, paddleHeight);
+                boxCollider.size = new Vector2(currentWidth, paddleHeight);
+                yield return null;
+            }
+        }
+
         this.PaddleTransforming = false;
     }
 
     private IEnumerator ResetPaddleWidthAfterTime(float seconds)
     {
-       yield return new WaitForSeconds(this.paddleWidth);
+       yield return new WaitForSeconds(seconds);
+       // Debug.Log($"Shrinking Time{Time.time}");
        this.StartWidthAmnimation(this.paddleWidth);
     }
 
@@ -120,5 +141,58 @@ public class PaddleScript : MonoBehaviour
         }
 
     }
+    }
+
+    public void StartShooting()
+    {
+      if(!this.PaddleTransforming){
+        PaddleShooting = true;
+        StartCoroutine(StartShootingRoutine());
+      }
+    }
+
+    public IEnumerator StartShootingRoutine()
+    {
+        float fireCoolDown = .5f;
+        float fireCoolDownLeft = 0;
+        float shootingDuration = 10;
+        float shootingDurationLeft = shootingDuration;
+
+        while (shootingDurationLeft >= 0)
+        {
+            fireCoolDownLeft -= Time.deltaTime;
+            shootingDurationLeft -= Time.deltaTime;
+            if (fireCoolDownLeft <= 0)
+            {
+              this.Shoot();
+              fireCoolDownLeft = fireCoolDown;
+            
+                
+            }
+            yield return null;
+            
+        }
+
+        this.PaddleShooting = false;
+        leftMuzzle.SetActive(false);
+       rightMuzzle.SetActive(false);
+    }
+
+    private void Shoot()
+    {
+       leftMuzzle.SetActive(false);
+       rightMuzzle.SetActive(false);
+       leftMuzzle.SetActive(true);
+       rightMuzzle.SetActive(true);
+       this.SpawnBullet(leftMuzzle);
+       this.SpawnBullet(rightMuzzle);
+    }
+
+        private void SpawnBullet(GameObject muzzle)
+    {
+        Vector3 spawnPosition = new Vector3(muzzle.transform.position.x, muzzle.transform.position.y + 0.2f, muzzle.transform.position.z);
+        Projectile bullet = Instantiate(bulletPrefab, spawnPosition, Quaternion.identity);
+        Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
+        bulletRb.AddForce(new Vector2(0, 450f));
     }
 }

@@ -38,19 +38,37 @@ private BoxCollider2D boxCollider;
     }
 
     private void OnCollisionEnter2D(Collision2D coll){
-    Ball ball = coll.gameObject.GetComponent<Ball>();
-    ApplyCollisionLogic(ball);
+
+     bool instantKill = false;
+     if(coll.collider.tag == "Ball"){
+          Ball ball = coll.gameObject.GetComponent<Ball>();
+          instantKill = ball.isLightningBall;
+     }
+
+     if(coll.collider.tag == "Ball"|| coll.collider.tag == "Projectile"){
+
+ ApplyCollisionLogic(instantKill);
+     }
 }
 
  private void OnTriggerEnter2D(Collider2D coll){
-       Ball ball = coll.gameObject.GetComponent<Ball>();
-    ApplyCollisionLogic(ball);
+     bool instantKill = false;
+     if(coll.tag == "Ball"){
+          Ball ball = coll.gameObject.GetComponent<Ball>();
+          instantKill = ball.isLightningBall;
+     }
+
+     if(coll.tag == "Ball"|| coll.tag == "Projectile"){
+
+ ApplyCollisionLogic(instantKill);
+     }
+       
  }
 
-    private void ApplyCollisionLogic(Ball ball)
+    private void ApplyCollisionLogic(bool instantKill)
     {
        this.hitPoints --;
-       if(this.hitPoints <= 0 || (ball != null && ball.isLightningBall)){
+       if(this.hitPoints <= 0 || instantKill){
            BricksManager.instance.RemainingBricks.Remove(this);
            OnBrickDestruction?.Invoke(this);
            OnBricksDestroy();

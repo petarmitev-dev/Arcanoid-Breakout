@@ -34,6 +34,7 @@ private void Start(){
     this.Lives = this.availableLives;
     Ball.OnBallDeath += OnBallDeath;
     Brick.OnBrickDestruction += OnBrickDestruction;
+    
 
 }
 private void OnBrickDestruction(Brick obj){
@@ -65,6 +66,7 @@ gameOverScreen.SetActive(true);
 
     private void OnDisable(){
     Ball.OnBallDeath -= OnBallDeath;
+    Brick.OnBrickDestruction -= OnBrickDestruction;
 }
 
 
